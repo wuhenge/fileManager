@@ -1,12 +1,10 @@
 # Dependencies
-node_modules/
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
+**/node_modules/
 
 # Build outputs
 dist/
 build/
+coverage/
 *.egg-info/
 
 # Environment
@@ -25,6 +23,7 @@ lerna-debug.log*
 .DS_Store
 Thumbs.db
 desktop.ini
+$RECYCLE.BIN/
 
 # IDE
 .idea/
@@ -39,13 +38,5 @@ desktop.ini
 *.njsproj
 *.sln
 
-# OS-specific files
-desktop.ini
-$RECYCLE.BIN/
-
-# Backend data (runtime)
-app/backend/data/
-app/backend/logs/
-
-# Frontend generated
-frontend/src-tauri/
+# Keep empty directories under app with placeholder files
+!app/**/.gitkeep
