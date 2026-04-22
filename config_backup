@@ -1,0 +1,13 @@
+{
+    ".url": {
+        "fileManager.Application": {
+            "title": "文件管家",
+            "icon": "images/ICON_256.PNG",
+            "type": "url",
+            "protocol": "http",
+            "port": "3300",
+            "url": "/",
+            "allUsers": true
+        }
+    }
+}

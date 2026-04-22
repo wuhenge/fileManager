@@ -1,0 +1,24 @@
+{
+    "data-share": {
+        "shares": [
+            {
+                "name": "fileManager",
+                "permission": {
+                    "rw": ["fileManager"]
+                }
+            },
+            {
+                "name": "fileManager/data",
+                "permission": {
+                    "rw": ["fileManager"]
+                }
+            },
+            {
+                "name": "fileManager/logs",
+                "permission": {
+                    "rw": ["fileManager"]
+                }
+            }
+        ]
+    }
+}

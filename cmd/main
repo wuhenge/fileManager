@@ -1,0 +1,153 @@
+#!/bin/bash
+
+# 配置 Node.js 环境
+export PATH=/var/apps/nodejs_v24/target/bin:$PATH
+
+LOG_FILE="${TRIM_PKGVAR}/info.log"
+PID_FILE="${TRIM_PKGVAR}/app.pid"
+
+# backend 目录在 app 下
+APP_DIR="${TRIM_APPDEST}/backend"
+NODE_CMD="cd ${APP_DIR} && npm install && node server.js"
+
+log_msg() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "${LOG_FILE}"
+}
+
+start_process() {
+    if status; then
+        log_msg "Process already running"
+        return 0
+    fi
+
+    log_msg "Starting process ..."
+    log_msg "TRIM_APPDEST=${TRIM_APPDEST}"
+    log_msg "APP_DIR=${APP_DIR}"
+    log_msg "PATH=${PATH}"
+    
+    # 检查 node 命令是否可用
+    if ! command -v node &> /dev/null; then
+        log_msg "Error: node command not found in PATH"
+        log_msg "Please ensure nodejs_v24 is installed"
+        return 1
+    fi
+    
+    log_msg "Node version: $(node -v)"
+    log_msg "NPM version: $(npm -v)"
+    
+    # 检查 backend 目录是否存在
+    if [ ! -d "$APP_DIR" ]; then
+        log_msg "Error: backend directory not found at ${APP_DIR}"
+        # 列出 APP_DEST 目录内容以便调试
+        log_msg "Listing TRIM_APPDEST:"
+        ls -la "${TRIM_APPDEST}" >> "${LOG_FILE}" 2>&1
+        return 1
+    fi
+    
+    # 运行启动命令
+    bash -c "${NODE_CMD}" >> "${LOG_FILE}" 2>&1 &
+    local pid=$!
+    
+    # 写入 pid 到 pidfile
+    printf "%s" "$pid" > "${PID_FILE}"
+    log_msg "Process started with pid = $pid"
+    
+    # 等待几秒检查进程是否真的启动
+    sleep 2
+    if ! check_process "$pid"; then
+        log_msg "Error: Process failed to start"
+        rm -f "${PID_FILE}"
+        return 1
+    fi
+    
+    return 0
+}
+
+stop_process() {
+    log_msg "Stopping process ..."
+
+    if [ -r "${PID_FILE}" ]; then
+        local pid=$(head -n 1 "${PID_FILE}" | tr -d '[:space:]')
+        
+        log_msg "pid=${pid}"
+        if ! check_process "${pid}"; then
+            # 进程不存在，删除 pidfile
+            rm -f "${PID_FILE}"
+            log_msg "remove pid file (process not running)"
+            return 0
+        fi
+
+        log_msg "send TERM signal to PID:${pid}..."
+        kill -TERM "${pid}" >> "${LOG_FILE}" 2>&1
+
+        local count=0
+        while check_process "${pid}" && [ $count -lt 10 ]; do
+            sleep 1
+            count=$((count + 1))
+            log_msg "waiting process terminate... (${count}s/10s)"
+        done
+
+        if check_process "${pid}"; then
+            log_msg "send KILL signal to PID:${pid}..."
+            kill -KILL "${pid}"
+            sleep 1
+        fi
+        
+        rm -f "${PID_FILE}"
+        log_msg "process stopped"
+    else
+        log_msg "PID file not found"
+    fi
+
+    return 0
+}
+
+check_process() {
+    local pid=$1
+    if [ -z "$pid" ]; then
+        return 1
+    fi
+    if kill -0 "${pid}" 2>/dev/null; then
+        return 0  # 进程存在
+    else
+        return 1  # 进程不存在
+    fi
+}
+
+status() {
+    if [ -f "${PID_FILE}" ]; then
+        local pid=$(head -n 1 "${PID_FILE}" | tr -d '[:space:]')
+        if check_process "${pid}"; then
+            return 0
+        else
+            # 进程没有在运行但 pidfile 存在 - 清理它
+            rm -f "${PID_FILE}"
+        fi    
+    fi
+
+    return 1
+}
+
+case $1 in
+start)
+    # 运行启动命令，成功退出 0，失败退出 1
+    start_process
+    exit $?
+    ;;
+stop)
+    # 运行停止命令，成功退出 0，失败退出 1
+    stop_process
+    exit 0
+    ;;
+status)
+    # 检查应用状态命令，运行中退出 0，未运行退出 3
+    if status; then 
+        exit 0
+    else 
+        exit 3
+    fi
+    ;;
+*)
+    exit 1
+    ;;
+esac

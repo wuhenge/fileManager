@@ -1,0 +1,49 @@
+@media screen and (max-width: 768px) {
+  .app-header {
+    padding: 0 16px !important;
+  }
+
+  .app-title {
+    font-size: 16px !important;
+  }
+
+  .app-logo {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .app-content {
+    padding: 16px 12px !important;
+  }
+
+  .arco-tabs-nav {
+    overflow-x: auto;
+  }
+
+  .arco-tabs-tab {
+    padding: 10px 8px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+  }
+
+  .arco-modal {
+    width: 95% !important;
+    max-width: 95% !important;
+  }
+
+  .arco-modal-body {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .app-title {
+    font-size: 14px !important;
+  }
+
+  .arco-tabs-tab {
+    padding: 8px 6px !important;
+    font-size: 12px !important;
+  }
+}

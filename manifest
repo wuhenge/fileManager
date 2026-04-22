@@ -1,0 +1,11 @@
+appname               = fileManager
+version               = 1.0.0
+display_name          = 飞牛文件管家
+desc                  = 基于 React + Node.js 的飞牛文件管家应用
+arch                  = x86_64
+source                = thirdparty
+maintainer            = developer
+distributor           = developer
+desktop_uidir         = ui
+desktop_applaunchname = fileManager.Application
+install_dep_apps      = nodejs_v24
