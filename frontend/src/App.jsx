@@ -1579,6 +1579,33 @@ function App() {
           backgroundColor: 'var(--color-fill-1)',
           border: '1px solid var(--color-border)'
         }}>
+          {/* 返回上级箭头 */}
+          {currentPath !== '/' && (
+            <Tooltip content="返回上级">
+              <span
+                style={{
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  transition: 'all 0.2s',
+                  color: 'var(--color-text-2)'
+                }}
+                onClick={() => navigateToDirectory('/' + currentPath.split('/').filter(Boolean).slice(0, -1).join('/'))}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-fill-2)'
+                  e.currentTarget.style.color = 'rgb(var(--primary-6))'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                  e.currentTarget.style.color = 'var(--color-text-2)'
+                }}
+              >
+                <IconArrowLeft style={{ fontSize: 16 }} />
+              </span>
+            </Tooltip>
+          )}
           <IconFolder style={{ fontSize: 16, color: 'var(--color-text-3)' }} />
           {/* 路径面包屑 */}
           <div style={{
@@ -1590,31 +1617,43 @@ function App() {
             overflow: 'hidden'
           }}>
             <span style={{ fontSize: 13, color: 'var(--color-text-3)' }}>/</span>
-            {currentPath.split('/').filter(Boolean).map((item, index, arr) => {
-              const itemPath = '/' + arr.slice(0, index + 1).join('/')
-              const isLast = index === arr.length - 1
-              return (
-                <span key={itemPath} style={{ display: 'flex', alignItems: 'center' }}>
-                  <span
-                    style={{
-                      cursor: isLast ? 'default' : 'pointer',
-                      fontWeight: isLast ? 500 : 400,
-                      fontSize: 13,
-                      padding: '4px 8px',
-                      transition: 'all 0.2s',
-                      color: isLast ? 'var(--color-text-1)' : 'var(--color-text-2)',
-                      backgroundColor: isLast ? 'var(--color-fill-2)' : 'transparent'
-                    }}
-                    onClick={() => !isLast && navigateToDirectory(itemPath)}
-                  >
-                    {item}
+            {currentPath === '/' ? (
+              <span style={{
+                fontWeight: 500,
+                fontSize: 13,
+                padding: '4px 8px',
+                color: 'var(--color-text-1)',
+                backgroundColor: 'var(--color-fill-2)'
+              }}>
+                /
+              </span>
+            ) : (
+              currentPath.split('/').filter(Boolean).map((item, index, arr) => {
+                const itemPath = '/' + arr.slice(0, index + 1).join('/')
+                const isLast = index === arr.length - 1
+                return (
+                  <span key={itemPath} style={{ display: 'flex', alignItems: 'center' }}>
+                    <span
+                      style={{
+                        cursor: isLast ? 'default' : 'pointer',
+                        fontWeight: isLast ? 500 : 400,
+                        fontSize: 13,
+                        padding: '4px 8px',
+                        transition: 'all 0.2s',
+                        color: isLast ? 'var(--color-text-1)' : 'var(--color-text-2)',
+                        backgroundColor: isLast ? 'var(--color-fill-2)' : 'transparent'
+                      }}
+                      onClick={() => !isLast && navigateToDirectory(itemPath)}
+                    >
+                      {item}
+                    </span>
+                    {!isLast && (
+                      <span style={{ margin: '0 4px', color: 'var(--color-text-4)' }}>/</span>
+                    )}
                   </span>
-                  {!isLast && (
-                    <span style={{ margin: '0 4px', color: 'var(--color-text-4)' }}>/</span>
-                  )}
-                </span>
-              )
-            })}
+                )
+              })
+            )}
           </div>
         </div>
 

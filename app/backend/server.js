@@ -767,7 +767,7 @@ app.get('/api/directories', async (req, res) => {
       .sort((a, b) => a.name.localeCompare(b.name));
     
     // 添加返回上级选项
-    if (targetPath !== '/vol1' && targetPath !== '/') {
+    if (targetPath !== '/') {
       const parentPath = path.dirname(targetPath);
       directories.unshift({
         name: '..',
